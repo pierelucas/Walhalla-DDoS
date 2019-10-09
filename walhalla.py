@@ -37,11 +37,7 @@ class Walhalla():
         self.num_req = None
 
     def input(self):
-        print(sys.argv[1])
-        pbar = PB()
-        y = [1, 2, 3, 4, 5, 6]
-        for i in pbar(y):
-            print(i)
+        pass
 
     def out(self):
         print(Fore.CYAN + self.banner_txt)
