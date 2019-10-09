@@ -4,7 +4,7 @@
 import os, sys, time, subprocess
 import socket, threading
 from colorama import Fore, Style
-from progressbar import Bar
+from progressbar import ProgressBar as PB
 
 class Walhalla():
 
@@ -37,14 +37,20 @@ class Walhalla():
         self.num_req = None
 
     def input(self):
-        pass
+        print(sys.argv[1])
+        pbar = PB()
+        y = [1, 2, 3, 4, 5, 6]
+        for i in pbar(y):
+            print(i)
 
     def out(self):
-        print(self.banner_txt)
+        print(Fore.CYAN + self.banner_txt)
+        print(Style.RESET_ALL)
+
 
     def run(self):
-        self.input()
         self.out()
+        self.input()
 
 # TO BE CONTINUED ...
 walhalla = Walhalla()
