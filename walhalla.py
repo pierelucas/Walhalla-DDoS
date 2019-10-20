@@ -13,10 +13,6 @@ class Dos():
     def udp_flood(self):
         pass
 
-
-
-
-
 class Controller(Dos):
 
     def __init__(self):
