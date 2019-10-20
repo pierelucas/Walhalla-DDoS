@@ -2,11 +2,22 @@
 # Modules
 #
 import os, sys, time, subprocess
-import socket, threading
+import socket
 from colorama import Fore, Style
-from progressbar import ProgressBar as PB
 
-class Walhalla():
+class Dos():
+
+    def tcp_flood(self):
+        pass
+
+    def udp_flood(self):
+        pass
+
+
+
+
+
+class Controller(Dos):
 
     def __init__(self):
         # Time
@@ -33,7 +44,6 @@ class Walhalla():
         self.host = None
         self.ip = None
         self.port = None
-        self.threads = None
         self.num_req = None
 
     def input(self):
@@ -43,11 +53,13 @@ class Walhalla():
         print(Fore.CYAN + self.banner_txt)
         print(Style.RESET_ALL)
 
+    def threads(self):
+        pass
 
     def run(self):
         self.out()
         self.input()
 
-# TO BE CONTINUED ...
-walhalla = Walhalla()
-walhalla.run()
+if __name__ == "__main__":
+    walhalla = Walhalla()
+    walhalla.run()
