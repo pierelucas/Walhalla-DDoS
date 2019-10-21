@@ -101,9 +101,15 @@ class Controller(Dos):
             try:
                 args.port = int(args.port)
                 args.buffer_size = int(args.buffer_size)
+                if args.dos_mode != 'udp' and 'tcp': raise Exception
+                elif args.port > 35535: raise Exception
+                elif args.buffer_size > 65507: raise Exception
                 return True
             except ValueError as ex:
-                print("Wrong Value: ", ex)
+                print("Wrong Value :", ex)
+                sys.exit(0)
+            except Exception as ex:
+                print("Use -h or --help for futher information :", ex)
                 sys.exit(0)
         else:
             print("Use -h or --help for futher information")
@@ -139,7 +145,7 @@ class Controller(Dos):
             print(RED + "Error in Threading [{}] :", ex, + RESET)
             sys.exit(0)
         except KeyboardInterrupt as ex:
-            print(RED + "Exit - you pressed ctrl + c :", ex, + RESET)
+            print(RED + "YOU PRESSED CTRL + C :", ex, + RESET)
             sys.exit(0)
 
     def run(self):
