@@ -1,5 +1,5 @@
 # Author: PiereLucas(Julian Huch)
-# Walhalla - A simple Python udp and tcp dos tool
+# Walhalla - A simple Python udp and tcp ddos tool
 # MIT License
 
 # Modules
