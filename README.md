@@ -17,3 +17,7 @@
 + -bs Buffer size defines the package in bytes
 
 + close dos loop with ctrl+c
+
+##### MIT LICENSE
++ read LICENSE for futher information
++ Coded by PiereLucas (Julian Huch)
