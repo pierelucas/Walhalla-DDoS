@@ -1,3 +1,7 @@
+# Author: PiereLucas(Julian Huch)
+# Walhalla - A simple Python udp and tcp dos tool
+# MIT License
+
 # Modules
 import os
 import sys
@@ -53,12 +57,6 @@ class Controller(Dos):
                     Date: %d.%m.%y      | Time: %H:%M
                     
             """)
-
-        # Details
-        self.host = None
-        self.ip = None
-        self.port = None
-        self.num_req = None
 
     def arguments(self):
         parser = ArgumentParser(description=self.banner_txt)
