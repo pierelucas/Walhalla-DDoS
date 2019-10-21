@@ -21,7 +21,7 @@ RESET = Fore.RESET
 class Dos():
 
     def size(self, buffer_size):
-        size = os.urandom(min(65500, buffer_size))
+        size = os.urandom(min(65500, int(buffer_size)))
         return size
 
     def tcp_flood(self, ip, port, buffer_size):
@@ -74,7 +74,7 @@ class Controller(Dos):
         if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
             try:
                 args.port = int(args.port)
-                args.buffer_size = bytes(args.buffer_size, encoding="utf-8")
+                args.buffer_size = int(args.buffer_size)
                 return True
             except ValueError as ex:
                 print("Wrong Value: ", ex)
