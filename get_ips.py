@@ -2,6 +2,6 @@ import socket
 
 def get_fqdm(url):
     ip = socket.gethostbyname(url)
-    print(ip)
+    print("IP: ", ip)
 
-get_fqdm("5.9.108.139")
+get_fqdm(str(input("Input URL: ")))
