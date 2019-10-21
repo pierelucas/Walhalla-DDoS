@@ -8,8 +8,8 @@ import sys
 import time
 import socket
 from modules import socks
+from modules.colorama import Fore
 from threading import Thread
-from colorama import Fore
 from argparse import ArgumentParser
 
 # Colors
