@@ -83,12 +83,12 @@ class Controller(Dos):
     def arguments(self):
         """ Argument Parser for user input """
 
-        parser = ArgumentParser(description=self.banner_txt.replace("-V-", self.version))
-        parser.add_argument("-t", "--target", dest="target_addr")
-        parser.add_argument("-p", "--port", dest="port")
-        parser.add_argument("-m", "--mode", dest="dos_mode")
-        parser.add_argument("-a", "--amount", dest="amount")
-        parser.add_argument("-bs", "--buffer-size", dest="buffer_size")
+        parser = ArgumentParser(description=CYAN + self.banner_txt.replace("-V-", self.version) + RESET)
+        parser.add_argument("-t", "--target", type=str, dest="target_addr", metavar="Target Address", help="[www.domain.com]")
+        parser.add_argument("-p", "--port", type=int, dest="port", metavar="Port Number", help="[1-35535]")
+        parser.add_argument("-m", "--mode", type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp]")
+        parser.add_argument("-a", "--amount", type=int, dest="amount", metavar="Number of Threads", help="N")
+        parser.add_argument("-bs", "--buffer-size", type=int, dest="buffer_size", metavar="Package size in bytes", help="[1-65507]")
         args = parser.parse_args()
         _true = self.check_args(args)
         if _true:
@@ -99,15 +99,10 @@ class Controller(Dos):
 
         if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
             try:
-                args.port = int(args.port)
-                args.buffer_size = int(args.buffer_size)
                 if args.dos_mode != 'udp' and 'tcp': raise Exception
                 elif args.port > 35535: raise Exception
                 elif args.buffer_size > 65507: raise Exception
                 return True
-            except ValueError as ex:
-                print("Wrong Value :", ex)
-                sys.exit(0)
             except Exception as ex:
                 print("Use -h or --help for futher information :", ex)
                 sys.exit(0)
