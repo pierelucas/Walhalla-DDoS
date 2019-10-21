@@ -15,3 +15,5 @@
     
 + -a Amount defines the number of Threads
 + -bs Buffer size defines the package in bytes
+
++ close dos loop with ctrl+c
