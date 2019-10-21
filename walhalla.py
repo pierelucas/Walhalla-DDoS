@@ -25,7 +25,7 @@ class Dos():
     def size(self, buffer_size):
         """ Make bytes from the user given buffer size """
 
-        size = os.urandom(min(65500, buffer_size))
+        size = os.urandom(min(65507, buffer_size))
         return size
 
     def tcp_flood(self, ip, port, buffer_size):
