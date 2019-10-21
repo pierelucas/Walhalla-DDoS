@@ -17,7 +17,6 @@ RED = Fore.RED
 CYAN = Fore.CYAN
 RESET = Fore.RESET
 
-
 class Dos():
     """
     Dos Class for the main dos functions
