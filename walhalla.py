@@ -21,7 +21,7 @@ RESET = Fore.RESET
 class Dos():
 
     def size(self, buffer_size):
-        size = os.urandom(min(65500, int(buffer_size)))
+        size = os.urandom(min(65500, buffer_size))
         return size
 
     def tcp_flood(self, ip, port, buffer_size):
