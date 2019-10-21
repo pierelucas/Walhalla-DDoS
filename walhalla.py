@@ -139,7 +139,7 @@ class Controller(Dos):
                 thread.start()
                 print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}]".format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
             print(GREEN + "Sending packets ...\n\nPRESS CTRL+C TO QUIT" + RESET)
-            while True:     # Keep Alive to still handle exceptions
+            while True:     # keep alive to still handle exceptions
                 time.sleep(1)
         except Exception as ex:
             print(RED + "Error in Threading [{}] :", ex, + RESET)
