@@ -1,5 +1,5 @@
 # Author: PiereLucas(Julian Huch)
-# Walhalla - A simple Python udp and tcp ddos tool
+# Walhalla - TCP/UDP/TOR DDOS TOOL WRITTEN IN PYTHON
 # MIT License
 
 # Dist Modules
