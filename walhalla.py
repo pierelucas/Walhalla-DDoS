@@ -1,11 +1,18 @@
-#
 # Modules
-#
-import os, sys, time, subprocess, re
+import os
+import sys
+import time
 import socket
 from threading import Thread
-from colorama import Fore, Style
+from colorama import Fore
 from argparse import ArgumentParser
+
+# Colors
+GREEN = Fore.GREEN
+RED = Fore.RED
+CYAN = Fore.CYAN
+RESET = Fore.RESET
+
 
 class Dos():
 
@@ -104,7 +111,6 @@ class Controller(Dos):
                 except KeyboardInterrupt:
                     print("DDOS EXIT - you pressed ctrl+c")
                     sys.exit(0)
-
 
     def run(self):
         target_addr, port, dos_mode, amount, buffer_size = self.arguments()
