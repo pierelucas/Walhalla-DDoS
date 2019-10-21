@@ -1,5 +1,5 @@
+# WALHALLA - TCP/UDP/TOR DDOS TOOL WRITTEN IN PYTHON
 # Author: PiereLucas(Julian Huch)
-# Walhalla - TCP/UDP/TOR DDOS TOOL WRITTEN IN PYTHON
 # MIT License
 
 # Dist Modules
