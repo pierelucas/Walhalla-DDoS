@@ -2,15 +2,16 @@
 # Walhalla - A simple Python udp and tcp ddos tool
 # MIT License
 
-# Modules
+# Dist Modules
 import os
 import sys
 import time
 import socket
-from modules import socks
-from modules.colorama import Fore
 from threading import Thread
 from argparse import ArgumentParser
+# Site Modules
+from modules import socks
+from modules.colorama import Fore
 
 # Colors
 GREEN = Fore.GREEN
