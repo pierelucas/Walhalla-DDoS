@@ -7,7 +7,7 @@ import os
 import sys
 import time
 import socket
-import socks
+from modules import socks
 from threading import Thread
 from colorama import Fore
 from argparse import ArgumentParser
