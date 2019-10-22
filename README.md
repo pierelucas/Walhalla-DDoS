@@ -24,7 +24,11 @@
         PACKET SIZE IN BYTES FROM 1 - 65507
         
 + If you use TOR then follow these Steps:
-    + you must setup first your torrc to cookie authentication method (https://www.linux.com/tutorials/beginners-guide-tor-ubuntu/)
+
+    
+    + sudo apt-get install python3-stem / pip3 install stem
+    + you must setup first your torrc to cookie authentication method 
+        (https://www.linux.com/tutorials/beginners-guide-tor-ubuntu/)
     + If course, TOR have to run on "localhost" and port "9050"    
 
 + TO EXIT DOS JUST PRESS CTRL + C 
