@@ -195,7 +195,6 @@ class Controller(Dos):
             sys.exit(0)
         except KeyboardInterrupt as ex:
             print(RED + "YOU PRESSED CTRL + C :", ex)
-            thread.join()
             sys.exit(0)
 
     def run(self):
