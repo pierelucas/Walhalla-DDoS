@@ -83,7 +83,7 @@ class Controller(Dos):
         self.time_hm = time.strftime("%H:%M")
 
         # Banner
-        self.version = "v1.1"
+        self.version = "v1.3"
         self.banner_txt = time.strftime("""
                          _       __      ____          ____     
                         | |     / /___ _/ / /_  ____ _/ / /___ _
