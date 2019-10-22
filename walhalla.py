@@ -181,7 +181,8 @@ class Controller(Dos):
                 thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
                 print(GREEN + "Starting Thread nr [{}] to target [{}]:[{}]".format(thread, target_ip, port) + RESET)
                 thread.start()
-                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}] \n\n".format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
+                print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}] \n\n" \
+                      .format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
             print(GREEN + "Sending packets ...\n\nPRESS CTRL+C TO QUIT" + RESET)
             while True:     # keep alive to still handle exceptions
                 time.sleep(1)
