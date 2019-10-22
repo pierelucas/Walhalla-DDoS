@@ -11,9 +11,11 @@ DDoS attack.
 # Don't use
 
 # Dist Modules
-import stem
 import os
 import sys
+import time
+from stem import Signal
+from stem.control import Controller
 # Site Modules
 from modules.colorama import Fore
 
@@ -25,7 +27,6 @@ RESET = Fore.RESET
 
 
 def check_for_file():
-    global tor_pass
     try:
         if os.path.isfile("../tor_pass.txt"):
             with open("../tor_pass.txt", 'rt') as f:
@@ -40,7 +41,13 @@ def check_for_file():
     except PermissionError as ex:
         print("no read/write permission :", ex)
         sys.exit(0)
+    else:
+        return tor_pass
 
-
-check_for_file()
-print(tor_pass)
+def switch_ip(tor_pass):
+    while True:
+        with Controller.from_port(port=9051) as controller:
+            controller.authenticate(tor_pass)
+            controller.signal(Signal.NEWNYM)
+            print("New TOR Circuit loaded ...")
+            time.sleep(10)
