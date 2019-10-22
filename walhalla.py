@@ -138,16 +138,16 @@ class Controller(Dos):
             if os.path.isfile("tor_pass.txt"):
                 with open("tor_pass.txt", 'rt') as f:
                     tor_pass = f.read()
-                    print("tor_pass loaded")
+                    print(CYAN + "TOR_PASS LOADED" + RESET)
                     if tor_pass == "":
-                        print("tor_pass file is empty")
+                        print(RED + "tor_pass file is empty")
                         sys.exit(0)
             else:
                 tor_pass = str(input("Tor Control Password » "))
                 with open("tor_pass.txt", 'wt') as f:
                     f.write(tor_pass)
         except PermissionError as ex:
-            print("no read/write permission :", ex)
+            print(RED + "No read/write permission :", ex)
             sys.exit(0)
         else:
             return tor_pass
