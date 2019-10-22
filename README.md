@@ -27,8 +27,9 @@
 
     
     + sudo apt-get install python3-stem / pip3 install stem
-    + you must setup first your torrc to cookie authentication method 
+    + you must setup first your torrc to hashed password method 
         (https://www.linux.com/tutorials/beginners-guide-tor-ubuntu/)
+    + save your password to the tor_pass file or input it
     + If course, TOR have to run on "localhost" and port "9050"    
 
 + TO EXIT DOS JUST PRESS CTRL + C 
