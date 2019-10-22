@@ -44,7 +44,7 @@ class Dos():
                     sock.connect((ip, port))
                     sock.send(data)
             except ProxyConnectionError as ex:
-                print(RED + "Waiting for new Circuit :" ,ex, + RESET)
+                print(RED + "Waiting for new Circuit :", ex, + RESET)
                 continue
             except Exception:
                 print(RED + "Error in TOR" + RESET)
