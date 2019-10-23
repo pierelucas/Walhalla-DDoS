@@ -35,6 +35,8 @@ class Dos():
         return size
 
     def rnd_ip(self):
+        """ Make random source IP and Port for spoofing """
+
         def ip():
             ip_list = []
             for i in range(4):
