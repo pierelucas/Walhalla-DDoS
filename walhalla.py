@@ -50,7 +50,7 @@ class Dos():
         return ip(), port()
 
     def syn_flood(self, ip, port, buffer_size=None):
-        """ Syn flood """
+        """ Syn flood function """
 
         while True:
             try:
