@@ -151,8 +151,9 @@ class Controller(Dos):
 
         try:
             if args.port > 35535: raise Exception
-            elif args.buffer_size > 65507: raise Exception
-            elif args.dos_mode == 'tor':
+            if args.buffer_size:
+                if args.buffer_size > 65507: raise Exception
+            if args.dos_mode == 'tor':
                 self.tor_pass = self.check_for_tor_pass()
             return True
         except Exception as ex:
