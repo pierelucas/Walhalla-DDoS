@@ -123,7 +123,7 @@ class Controller(Dos):
                         | |/ |/ / /_/ / / / / / /_/ / / / /_/ / 
                         |__/|__/\__,_/_/_/ /_/\__,_/_/_/\__,_/  
                                          [-V-]
-                         » A TCP/UDP/TOR DDOS TOOL WRITTEN IN PYTHON «
+                         » A TCP/UDP/SYN/TOR DDOS TOOL WRITTEN IN PYTHON «
               Coded by PiereLucas(Julian Huch) | https://github.com/pierelucas
                            Date: %d.%m.%y      | Time: %H:%M
                     
