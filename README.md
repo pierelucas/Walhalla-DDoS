@@ -27,7 +27,7 @@
 
     + sudo apt-get install python3-stem / pip3 install stem
     
-    + you must setup first your torrc to hashed password method 
+    + please setup first your torrc to use a hashed password 
         (https://www.linux.com/tutorials/beginners-guide-tor-ubuntu/
         
     + save your password to the tor_pass file or prompt it when walhalla ask you
