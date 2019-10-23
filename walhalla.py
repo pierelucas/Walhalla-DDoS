@@ -136,10 +136,10 @@ class Controller(Dos):
         """ Argument Parser for user input """
 
         parser = ArgumentParser(description=CYAN + self.banner_txt.replace("-V-", self.version) + RESET)
-        parser.add_argument("-t", "--target", type=str, dest="target_addr", metavar="Target Address", help="[www.domain.com]")
-        parser.add_argument("-p", "--port", type=int, dest="port", metavar="Port Number", help="[1-35535]")
-        parser.add_argument("-m", "--mode", type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp|syn|tor]")
-        parser.add_argument("-a", "--amount", type=int, dest="amount", metavar="Number of Threads", help="N")
+        parser.add_argument("-t", "--target", required=True, type=str, dest="target_addr", metavar="Target Address", help="[www.domain.com]")
+        parser.add_argument("-p", "--port", required=True, type=int, dest="port", metavar="Port Number", help="[1-35535]")
+        parser.add_argument("-m", "--mode", required=True, type=str, dest="dos_mode", metavar="DoS Mode", help="[udp|tcp|syn|tor]")
+        parser.add_argument("-a", "--amount", required=True, type=int, dest="amount", metavar="Number of Threads", help="N")
         parser.add_argument("-bs", "--buffer-size", type=int, dest="buffer_size", metavar="Package size in bytes", help="[1-65507]")
         args = parser.parse_args()
         _true = self.check_args(args)
@@ -149,18 +149,14 @@ class Controller(Dos):
     def check_args(self, args):
         """ Check from user given arguments """
 
-        if args.target_addr and args.port and args.dos_mode and args.amount and args.buffer_size:
-            try:
-                if args.port > 35535: raise Exception
-                elif args.buffer_size > 65507: raise Exception
-                elif args.dos_mode == 'tor':
-                    self.tor_pass = self.check_for_tor_pass()
-                return True
-            except Exception as ex:
-                print(RED + "Use -h or --help for futher information :", ex)
-                sys.exit(0)
-        else:
-            print(RED + "Use -h or --help for futher information")
+        try:
+            if args.port > 35535: raise Exception
+            elif args.buffer_size > 65507: raise Exception
+            elif args.dos_mode == 'tor':
+                self.tor_pass = self.check_for_tor_pass()
+            return True
+        except Exception as ex:
+            print(RED + "Use -h or --help for futher information :", ex)
             sys.exit(0)
 
     def check_for_tor_pass(self):
