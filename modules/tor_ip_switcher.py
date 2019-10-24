@@ -13,3 +13,4 @@ def switch_ip(*, tor_pass):
         controller.signal(Signal.NEWNYM)
         time.sleep(controller.get_newnym_wait())
         return True
+
