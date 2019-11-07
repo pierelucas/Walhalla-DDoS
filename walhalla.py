@@ -148,7 +148,7 @@ class Controller(Dos):
         if _true:
             return args.target_addr, args.port, args.dos_mode, args.amount, args.buffer_size
 
-    def check_args(self, args):
+    def check_args(self, args) -> bool:
         """ Check from user given arguments """
 
         try:
@@ -162,7 +162,7 @@ class Controller(Dos):
             print(RED + "Use -h or --help for futher information :", ex)
             sys.exit(0)
 
-    def check_for_tor_pass(self):
+    def check_for_tor_pass(self) -> str:
         """ Checking if the file 'tor_pass.txt' exists. When not ask prompt for TOR Control password """
 
         try:
@@ -183,7 +183,7 @@ class Controller(Dos):
         else:
             return tor_pass
 
-    def get_fqdm(self, target_addr):
+    def get_fqdm(self, target_addr) -> str:
         """ Get Fully qualified domain name from the www.domain.com form"""
 
         try:
